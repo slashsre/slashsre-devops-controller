@@ -1,0 +1,17 @@
+# Binaries
+bin/
+*.exe
+*.test
+*.out
+cover.out
+
+# UI build artifacts / deps
+ui/node_modules/
+ui/dist/
+
+# Local config & editor
+config.yaml
+.claude/settings.local.json
+.DS_Store
+.idea/
+.vscode/

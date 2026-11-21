@@ -1,0 +1,111 @@
+{
+  "nav": {
+    "home": "Home",
+    "nodeLifecycleRules": "Node lifecycle",
+    "queueTriggeredJobs": "Queue jobs",
+    "alertRemediations": "Alert remediation",
+    "postDeployTests": "Post-deploy tests",
+    "apiDocs": "API"
+  },
+  "home": {
+    "title": "slashsre devops controller",
+    "subtitle": "Declarative day-2 operations for any Kubernetes cluster, driven by custom resources.",
+    "gettingStarted": {
+      "title": "Getting started",
+      "description": "Every feature is configured with a custom resource. This portal shows the live status of those resources; it refreshes every 15 seconds."
+    }
+  },
+  "kinds": {
+    "nodeLifecycleRules": {
+      "subtitle": "Cordon and drain nodes before the cloud provider removes them",
+      "description": "A NodeLifecycleRule reads node lifecycle notifications from a queue (EC2 Spot interruption warnings or Auto Scaling lifecycle hooks), finds the node whose providerID matches the instance and drains it gracefully.",
+      "features": {
+        "f1": "Cluster-scoped rule with pluggable queue providers (aws-sqs today).",
+        "f2": "The message is acknowledged before draining, so the controller can safely drain its own node.",
+        "f3": "Configurable drain timeout, grace period, DaemonSet and emptyDir handling, and optional node selector.",
+        "f4": "Several nodes are drained in parallel within the provider's notice window."
+      }
+    },
+    "queueTriggeredJobs": {
+      "subtitle": "Launch Kubernetes Jobs when a queue has pending work",
+      "description": "A QueueTriggeredJob polls a queue and creates a Job from a CronJob template (or an inline template) once the approximate depth reaches minMessages, without exceeding maxActiveJobs.",
+      "features": {
+        "f1": "Scale batch workers to zero when the queue is empty.",
+        "f2": "Jobs are owned by the resource and garbage-collected with ttlSecondsAfterFinished.",
+        "f3": "Jobs started by the referenced CronJob count towards the concurrency limit.",
+        "f4": "Run a Job on demand from this portal or POST /api/v1/.../run."
+      }
+    },
+    "alertRemediations": {
+      "subtitle": "Self-healing actions triggered by Alertmanager",
+      "description": "An AlertRemediation matches Alertmanager webhook alerts by name, labels and an optional numeric threshold, then deletes the affected pod or performs a rolling restart of its workload.",
+      "features": {
+        "f1": "Only pods in the AlertRemediation's own namespace can be acted upon.",
+        "f2": "Thresholds accept plain numbers or percentages (\"50%\").",
+        "f3": "Per-target cooldown prevents restart loops.",
+        "f4": "Actions: DeletePod or RolloutRestart (Deployment, StatefulSet, DaemonSet)."
+      }
+    },
+    "postDeployTests": {
+      "subtitle": "Run tests after every deployment",
+      "description": "A PostDeployTest reacts to Flux notification events and starts an in-cluster Job and/or an external CI pipeline (GitHub Actions or Bitbucket Pipelines).",
+      "features": {
+        "f1": "Match Flux events by kind, name, namespace, reason and message.",
+        "f2": "Pipeline credentials are read from a Secret in the same namespace.",
+        "f3": "Cooldown avoids duplicate runs when Flux emits several events.",
+        "f4": "Run tests on demand from this portal or the API."
+      }
+    }
+  },
+  "columns": {
+    "namespace": "Namespace",
+    "name": "Name",
+    "format": "Format",
+    "drained": "Drained",
+    "failed": "Failed",
+    "lastNode": "Last node",
+    "lastPoll": "Last poll",
+    "ready": "Ready",
+    "depth": "Queue depth",
+    "minMessages": "Min. messages",
+    "active": "Active",
+    "triggered": "Triggered",
+    "lastJob": "Last job",
+    "alert": "Alert",
+    "action": "Action",
+    "threshold": "Threshold",
+    "remediations": "Remediations",
+    "lastTarget": "Last target",
+    "lastRun": "Last run",
+    "trigger": "Trigger",
+    "target": "Runs",
+    "runs": "Count",
+    "lastError": "Last error"
+  },
+  "common": {
+    "howItWorks": "How it works",
+    "resources": "Resources",
+    "example": "Example",
+    "loading": "Loading…",
+    "empty": "No resources of this kind yet. Apply the example below to get started.",
+    "loadError": "Could not load resources",
+    "suspended": "suspended",
+    "runNow": "Run now",
+    "started": "started",
+    "notFound": "Unknown resource kind.",
+    "tokenPrompt": "This action requires the API token:"
+  },
+  "apiDocs": {
+    "title": "API documentation",
+    "subtitle": "REST API, webhook receivers and OpenAPI specification",
+    "interactive": {
+      "title": "Interactive documentation",
+      "description": "Explore every endpoint: resource listing, on-demand runs, Alertmanager and Flux webhook receivers, health probes and metrics.",
+      "openSwagger": "Open Swagger UI",
+      "downloadJson": "Download OpenAPI JSON"
+    }
+  },
+  "footer": {
+    "copyright": "slashsre devops controller · open source"
+  }
+}

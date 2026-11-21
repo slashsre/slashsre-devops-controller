@@ -1,0 +1,36 @@
+# Run the "image-resizer" CronJob template whenever 2+ messages are waiting.
+apiVersion: slashsre.controller.io/v1alpha1
+kind: QueueTriggeredJob
+metadata:
+  name: image-resizer
+  namespace: workers
+spec:
+  queue:
+    url: https://sqs.eu-central-1.amazonaws.com/123456789012/image-resize
+  minMessages: 2
+  pollInterval: 10s
+  maxActiveJobs: 1
+  job:
+    cronJobRef:
+      name: image-resizer
+    ttlSecondsAfterFinished: 600
+---
+# Inline Job template instead of a CronJob reference.
+apiVersion: slashsre.controller.io/v1alpha1
+kind: QueueTriggeredJob
+metadata:
+  name: report-builder
+  namespace: workers
+spec:
+  queue:
+    url: https://sqs.eu-central-1.amazonaws.com/123456789012/reports
+  job:
+    template:
+      spec:
+        backoffLimit: 1
+        template:
+          spec:
+            restartPolicy: Never
+            containers:
+            - name: builder
+              image: ghcr.io/example/report-builder:1.0.0

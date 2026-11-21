@@ -1,0 +1,61 @@
+# Integration tests as a Job when Flux starts reconciling the "shop" Kustomization.
+apiVersion: slashsre.controller.io/v1alpha1
+kind: PostDeployTest
+metadata:
+  name: shop-integration
+  namespace: shop
+spec:
+  trigger:
+    flux:
+      kind: Kustomization
+      name: shop
+      reasons: ["Progressing"]
+  job:
+    cronJobRef:
+      name: api-integration-tests
+---
+# End-to-end tests in GitHub Actions once the health checks pass.
+apiVersion: slashsre.controller.io/v1alpha1
+kind: PostDeployTest
+metadata:
+  name: shop-e2e
+  namespace: shop
+spec:
+  trigger:
+    flux:
+      kind: Kustomization
+      name: shop
+      messageContains: Health check passed
+  pipeline:
+    provider: github
+    repository: example-org/e2e-tests
+    ref: main
+    pipeline: e2e.yml
+    variables:
+      environment: staging
+    credentialsSecretRef:
+      name: ci-credentials   # key "token"
+  cooldown: 5m
+---
+# Flux notification-controller: send events to the controller.
+apiVersion: notification.toolkit.fluxcd.io/v1beta3
+kind: Provider
+metadata:
+  name: slashsre-devops-controller
+  namespace: flux-system
+spec:
+  type: generic
+  address: http://slashsre-devops-controller.slashsre-system.svc:9898/webhooks/flux
+---
+apiVersion: notification.toolkit.fluxcd.io/v1beta3
+kind: Alert
+metadata:
+  name: slashsre-devops-controller
+  namespace: flux-system
+spec:
+  providerRef:
+    name: slashsre-devops-controller
+  eventSeverity: info
+  eventSources:
+  - kind: Kustomization
+    name: "*"

@@ -1,0 +1,12 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: slashsre-devops-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: slashsre-devops-controller
+subjects:
+- kind: ServiceAccount
+  name: slashsre-devops-controller
+  namespace: slashsre-system

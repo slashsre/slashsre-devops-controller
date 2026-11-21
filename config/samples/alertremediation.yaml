@@ -1,0 +1,26 @@
+# Delete the throttled pod of "checkout" when CPU throttling reaches 50%.
+apiVersion: slashsre.controller.io/v1alpha1
+kind: AlertRemediation
+metadata:
+  name: checkout-cpu-throttling
+  namespace: shop
+spec:
+  alertName: CPUThrottlingHigh
+  matchLabels:
+    container: checkout
+  threshold: "50%"
+  action: DeletePod
+  cooldown: 10m
+---
+# Rolling restart of the owning Deployment when memory is close to the limit.
+apiVersion: slashsre.controller.io/v1alpha1
+kind: AlertRemediation
+metadata:
+  name: cart-memory
+  namespace: shop
+spec:
+  alertName: ContainerMemoryNearLimit
+  matchLabels:
+    container: cart
+  threshold: "90"
+  action: RolloutRestart

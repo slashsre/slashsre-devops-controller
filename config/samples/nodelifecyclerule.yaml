@@ -1,0 +1,25 @@
+# Drain nodes announced by EC2 Spot interruption warnings (EventBridge -> SQS).
+apiVersion: slashsre.controller.io/v1alpha1
+kind: NodeLifecycleRule
+metadata:
+  name: spot-interruptions
+spec:
+  eventFormat: aws-spot-interruption
+  source:
+    url: https://sqs.eu-central-1.amazonaws.com/123456789012/spot-interruptions
+  pollInterval: 5s
+  drain:
+    timeout: 90s
+---
+# Drain nodes terminated by an Auto Scaling Group lifecycle hook.
+apiVersion: slashsre.controller.io/v1alpha1
+kind: NodeLifecycleRule
+metadata:
+  name: asg-termination
+spec:
+  eventFormat: aws-asg-lifecycle-hook
+  source:
+    url: https://sqs.eu-central-1.amazonaws.com/123456789012/asg-lifecycle-hook
+  nodeSelector:
+    matchLabels:
+      node.kubernetes.io/lifecycle: normal

@@ -1,0 +1,112 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: slashsre-devops-controller
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - create
+  - patch
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - delete
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - pods/eviction
+  verbs:
+  - create
+- apiGroups:
+  - ""
+  resources:
+  - secrets
+  verbs:
+  - get
+- apiGroups:
+  - apps
+  resources:
+  - daemonsets
+  - deployments
+  - statefulsets
+  verbs:
+  - get
+  - list
+  - patch
+  - watch
+- apiGroups:
+  - apps
+  resources:
+  - replicasets
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - cronjobs
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - batch
+  resources:
+  - jobs
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - watch
+- apiGroups:
+  - slashsre.controller.io
+  resources:
+  - alertremediations
+  - postdeploytests
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - slashsre.controller.io
+  resources:
+  - alertremediations/status
+  - nodelifecyclerules/status
+  - postdeploytests/status
+  - queuetriggeredjobs/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - slashsre.controller.io
+  resources:
+  - nodelifecyclerules
+  - queuetriggeredjobs
+  verbs:
+  - get
+  - list
+  - patch
+  - update
+  - watch

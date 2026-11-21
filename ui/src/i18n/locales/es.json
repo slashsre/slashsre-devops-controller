@@ -1,0 +1,111 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "nodeLifecycleRules": "Ciclo de vida de nodos",
+    "queueTriggeredJobs": "Jobs por cola",
+    "alertRemediations": "Remediación de alertas",
+    "postDeployTests": "Tests post-despliegue",
+    "apiDocs": "API"
+  },
+  "home": {
+    "title": "slashsre devops controller",
+    "subtitle": "Operaciones day-2 declarativas para cualquier clúster de Kubernetes, gestionadas con recursos personalizados.",
+    "gettingStarted": {
+      "title": "Primeros pasos",
+      "description": "Cada funcionalidad se configura con un recurso personalizado. Este portal muestra el estado en vivo de esos recursos y se actualiza cada 15 segundos."
+    }
+  },
+  "kinds": {
+    "nodeLifecycleRules": {
+      "subtitle": "Cordona y drena nodos antes de que el proveedor cloud los elimine",
+      "description": "Un NodeLifecycleRule lee notificaciones de ciclo de vida de nodos desde una cola (avisos de interrupción de EC2 Spot o lifecycle hooks de Auto Scaling), localiza el nodo cuyo providerID coincide con la instancia y lo drena de forma ordenada.",
+      "features": {
+        "f1": "Regla a nivel de clúster con proveedores de colas enchufables (hoy aws-sqs).",
+        "f2": "El mensaje se confirma antes de drenar, así el controller puede drenar su propio nodo sin bucles.",
+        "f3": "Timeout, grace period, DaemonSets, emptyDir y selector de nodos configurables.",
+        "f4": "Varios nodos se drenan en paralelo dentro de la ventana de aviso del proveedor."
+      }
+    },
+    "queueTriggeredJobs": {
+      "subtitle": "Lanza Jobs de Kubernetes cuando una cola tiene trabajo pendiente",
+      "description": "Un QueueTriggeredJob consulta una cola y crea un Job a partir de la plantilla de un CronJob (o una plantilla inline) cuando la profundidad aproximada alcanza minMessages, sin superar maxActiveJobs.",
+      "features": {
+        "f1": "Workers batch que escalan a cero cuando la cola está vacía.",
+        "f2": "Los Jobs pertenecen al recurso y se limpian con ttlSecondsAfterFinished.",
+        "f3": "Los Jobs lanzados por el propio CronJob cuentan para el límite de concurrencia.",
+        "f4": "Ejecución bajo demanda desde este portal o con POST /api/v1/.../run."
+      }
+    },
+    "alertRemediations": {
+      "subtitle": "Acciones de auto-reparación disparadas por Alertmanager",
+      "description": "Un AlertRemediation compara las alertas del webhook de Alertmanager por nombre, etiquetas y un umbral numérico opcional, y borra el pod afectado o reinicia de forma progresiva su workload.",
+      "features": {
+        "f1": "Solo se actúa sobre pods del mismo namespace que el AlertRemediation.",
+        "f2": "Los umbrales aceptan números o porcentajes (\"50%\").",
+        "f3": "El cooldown por objetivo evita bucles de reinicio.",
+        "f4": "Acciones: DeletePod o RolloutRestart (Deployment, StatefulSet, DaemonSet)."
+      }
+    },
+    "postDeployTests": {
+      "subtitle": "Ejecuta tests después de cada despliegue",
+      "description": "Un PostDeployTest reacciona a los eventos de notificación de Flux y lanza un Job en el clúster y/o un pipeline de CI externo (GitHub Actions o Bitbucket Pipelines).",
+      "features": {
+        "f1": "Filtra eventos de Flux por kind, nombre, namespace, reason y mensaje.",
+        "f2": "Las credenciales del pipeline se leen de un Secret del mismo namespace.",
+        "f3": "El cooldown evita ejecuciones duplicadas cuando Flux emite varios eventos.",
+        "f4": "Ejecución bajo demanda desde este portal o la API."
+      }
+    }
+  },
+  "columns": {
+    "namespace": "Namespace",
+    "name": "Nombre",
+    "format": "Formato",
+    "drained": "Drenados",
+    "failed": "Fallidos",
+    "lastNode": "Último nodo",
+    "lastPoll": "Última consulta",
+    "ready": "Listo",
+    "depth": "Mensajes",
+    "minMessages": "Mín. mensajes",
+    "active": "Activos",
+    "triggered": "Lanzados",
+    "lastJob": "Último job",
+    "alert": "Alerta",
+    "action": "Acción",
+    "threshold": "Umbral",
+    "remediations": "Remediaciones",
+    "lastTarget": "Último objetivo",
+    "lastRun": "Última ejecución",
+    "trigger": "Disparador",
+    "target": "Ejecuta",
+    "runs": "Ejecuciones",
+    "lastError": "Último error"
+  },
+  "common": {
+    "howItWorks": "Cómo funciona",
+    "resources": "Recursos",
+    "example": "Ejemplo",
+    "loading": "Cargando…",
+    "empty": "Todavía no hay recursos de este tipo. Aplica el ejemplo de abajo para empezar.",
+    "loadError": "No se pudieron cargar los recursos",
+    "suspended": "suspendido",
+    "runNow": "Ejecutar",
+    "started": "iniciado",
+    "notFound": "Tipo de recurso desconocido.",
+    "tokenPrompt": "Esta acción requiere el token de la API:"
+  },
+  "apiDocs": {
+    "title": "Documentación de la API",
+    "subtitle": "API REST, receptores de webhooks y especificación OpenAPI",
+    "interactive": {
+      "title": "Documentación interactiva",
+      "description": "Explora todos los endpoints: listado de recursos, ejecuciones bajo demanda, webhooks de Alertmanager y Flux, probes de salud y métricas.",
+      "openSwagger": "Abrir Swagger UI",
+      "downloadJson": "Descargar OpenAPI JSON"
+    }
+  },
+  "footer": {
+    "copyright": "slashsre devops controller · open source"
+  }
+}

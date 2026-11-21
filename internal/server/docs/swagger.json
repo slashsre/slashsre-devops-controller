@@ -1,0 +1,495 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Kubernetes controller for node lifecycle, queue-triggered jobs, alert remediation and post-deploy tests.",
+        "title": "slashsre-devops-controller API",
+        "contact": {
+            "name": "Source Code",
+            "url": "https://github.com/slashsre/slashsre-devops-controller"
+        },
+        "version": "1.0"
+    },
+    "basePath": "/",
+    "paths": {
+        "/api/info": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "API"
+                ],
+                "summary": "Runtime information",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/server.RuntimeResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/namespaces/{namespace}/postdeploytests/{name}/run": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Starts the Job and/or pipeline of a PostDeployTest immediately, ignoring cooldown.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "API"
+                ],
+                "summary": "Run a PostDeployTest",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Namespace",
+                        "name": "namespace",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "PostDeployTest name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "$ref": "#/definitions/server.RunResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/server.ErrorBody"
+                        }
+                    },
+                    "502": {
+                        "description": "Bad Gateway",
+                        "schema": {
+                            "$ref": "#/definitions/server.ErrorBody"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/namespaces/{namespace}/queuetriggeredjobs/{name}/run": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Creates a Job for a QueueTriggeredJob immediately, ignoring queue depth.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "API"
+                ],
+                "summary": "Run a QueueTriggeredJob",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Namespace",
+                        "name": "namespace",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "QueueTriggeredJob name",
+                        "name": "name",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "$ref": "#/definitions/server.RunResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/server.ErrorBody"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/resources": {
+            "get": {
+                "description": "Lists all slashsre.controller.io resources with their status.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "API"
+                ],
+                "summary": "List resources",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/server.ResourcesResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/healthz": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Liveness check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/readyz": {
+            "get": {
+                "description": "Ready once the Kubernetes informer cache has synced.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Health"
+                ],
+                "summary": "Readiness check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/version": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "API"
+                ],
+                "summary": "Version",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/webhooks/alertmanager": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Receives Alertmanager notifications and runs matching AlertRemediation actions.",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Alertmanager webhook",
+                "parameters": [
+                    {
+                        "description": "Alertmanager webhook payload",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/remediation.WebhookMessage"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "No matching rule",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "202": {
+                        "description": "Remediation started",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/server.ErrorBody"
+                        }
+                    }
+                }
+            }
+        },
+        "/webhooks/flux": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Receives Flux notification-controller events (generic provider) and starts matching PostDeployTests.",
+                "consumes": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Webhooks"
+                ],
+                "summary": "Flux notification webhook",
+                "parameters": [
+                    {
+                        "description": "Flux event",
+                        "name": "payload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/posttest.FluxEvent"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Accepted",
+                        "schema": {
+                            "$ref": "#/definitions/server.FluxResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/server.ErrorBody"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "posttest.FluxEvent": {
+            "type": "object",
+            "properties": {
+                "involvedObject": {
+                    "type": "object",
+                    "properties": {
+                        "kind": {
+                            "type": "string"
+                        },
+                        "name": {
+                            "type": "string"
+                        },
+                        "namespace": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "message": {
+                    "type": "string"
+                },
+                "reason": {
+                    "type": "string"
+                },
+                "severity": {
+                    "type": "string"
+                }
+            }
+        },
+        "remediation.Alert": {
+            "type": "object",
+            "properties": {
+                "annotations": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "endsAt": {
+                    "type": "string"
+                },
+                "fingerprint": {
+                    "type": "string"
+                },
+                "labels": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "startsAt": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "remediation.WebhookMessage": {
+            "type": "object",
+            "properties": {
+                "alerts": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/remediation.Alert"
+                    }
+                },
+                "groupKey": {
+                    "type": "string"
+                },
+                "receiver": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
+        "server.ErrorBody": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "server.FluxResponse": {
+            "type": "object",
+            "properties": {
+                "started": {
+                    "type": "integer"
+                }
+            }
+        },
+        "server.ResourcesResponse": {
+            "type": "object",
+            "properties": {
+                "alertRemediations": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "nodeLifecycleRules": {
+                    "description": "Items are full Kubernetes objects; see the CRD schemas for their fields.",
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "postDeployTests": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                },
+                "queueTriggeredJobs": {
+                    "type": "array",
+                    "items": {
+                        "type": "object"
+                    }
+                }
+            }
+        },
+        "server.RunResponse": {
+            "type": "object",
+            "properties": {
+                "jobName": {
+                    "type": "string"
+                },
+                "pipelineID": {
+                    "type": "string"
+                },
+                "pipelineURL": {
+                    "type": "string"
+                }
+            }
+        },
+        "server.RuntimeResponse": {
+            "type": "object",
+            "properties": {
+                "goarch": {
+                    "type": "string"
+                },
+                "goos": {
+                    "type": "string"
+                },
+                "hostname": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "num_cpu": {
+                    "type": "integer"
+                },
+                "num_goroutine": {
+                    "type": "integer"
+                },
+                "revision": {
+                    "type": "string"
+                },
+                "runtime": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BearerAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
+        }
+    }
+}
